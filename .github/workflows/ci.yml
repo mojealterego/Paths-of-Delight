@@ -1,0 +1,83 @@
+name: CI and APK
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python Tools/validate_content.py
+
+  preview-apk:
+    needs: validate-content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Install Android API 36
+        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.13'
+      - name: Build installable preview APK
+        working-directory: android-preview
+        run: gradle --no-daemon :app:assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Paths-of-Delight-preview-apk
+          path: android-preview/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+  unity-play:
+    needs: validate-content
+    runs-on: ubuntu-latest
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Unity license not configured
+        if: ${{ env.UNITY_LICENSE == '' }}
+        run: echo "Unity build skipped. Configure UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD to produce the canonical Unity APK."
+      - name: Unity EditMode tests
+        if: ${{ env.UNITY_LICENSE != '' }}
+        uses: game-ci/unity-test-runner@v4
+        with:
+          testMode: EditMode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build canonical Unity Play APK
+        if: ${{ env.UNITY_LICENSE != '' }}
+        uses: game-ci/unity-builder@v4
+        with:
+          targetPlatform: Android
+          unityVersion: 6000.3.13f1
+          buildMethod: PathsOfDelight.Editor.BuildCommand.PerformAndroidBuild
+          customParameters: -edition play
+          androidTargetSdkVersion: 36
+          androidExportType: androidPackage
+          allowDirtyBuild: true
+      - name: Upload Unity APK
+        if: ${{ env.UNITY_LICENSE != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Paths-of-Delight-unity-play-apk
+          path: build/Android/*.apk
+          if-no-files-found: error

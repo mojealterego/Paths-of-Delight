@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ścieżki Rozkoszy</title>
+<style>
+:root{--bg:#0e0710;--panel:#21101b;--gold:#c78c33;--text:#f5edf2;--muted:#c9b9c3}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#321527,var(--bg) 55%);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh}
+main{max-width:760px;margin:auto;padding:28px 20px 60px}.brand{letter-spacing:.12em;color:#f0c983;font-weight:800;font-size:28px}.edition{color:var(--muted);font-size:12px;margin-bottom:22px}
+.card{background:rgba(33,16,27,.96);border:1px solid #4a263b;border-radius:22px;padding:22px;box-shadow:0 20px 60px #0008;margin:14px 0}
+h1,h2{margin:0 0 14px}p{line-height:1.55;color:var(--muted)}button{width:100%;border:0;border-radius:14px;padding:16px;margin:7px 0;background:var(--gold);color:#1b0d15;font-weight:800;font-size:16px}
+button.alt{background:#3a1c2d;color:var(--text);border:1px solid #6a3651}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tile{padding:16px 4px;text-align:center;border-radius:12px;background:#311827}.tile.on{background:var(--gold);color:#1b0d15;font-weight:900}
+label{display:block;margin:12px 0;color:var(--muted)}input[type=text]{width:100%;padding:14px;border-radius:12px;border:1px solid #5a2d46;background:#160b12;color:white;font-size:16px}
+.range{width:100%}.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#3a1c2d;color:#f0c983;margin:4px}.hidden{display:none}.notice{border-left:4px solid var(--gold);padding-left:12px}
+</style>
+</head>
+<body><main>
+<div class="brand">ŚCIEŻKI ROZKOSZY</div><div class="edition">ANDROID PREVIEW • 18+ • LOCAL ONLY</div>
+<div id="app"></div>
+</main>
+<script>
+const cards=[
+{id:'p1',q:'Czy macie ochotę na minutę spokojnego kontaktu wzrokowego?',a:'Usiądźcie naprzeciwko siebie i przez minutę skupcie uwagę wyłącznie na sobie.',i:1,r:1},
+{id:'p2',q:'Czy oboje macie dziś ochotę na dłuższy pocałunek?',a:'Jeśli oboje nadal chcecie, wybierzcie spokojne miejsce i poświęćcie chwilę na pocałunek bez pośpiechu.',i:1,r:1},
+{id:'p3',q:'Czy chcecie spróbować krótkiej gry w ciepło–zimno z neutralnym dotykiem dłoni i ramion?',a:'Jedna osoba zamyka oczy, druga prowadzi ją słowami ciepło–zimno. Po chwili zamieńcie role.',i:1,r:2},
+{id:'p4',q:'Czy chcecie dziś spróbować krótkiej, umownej scenki flirtu?',a:'Wybierzcie neutralny motyw spotkania dwojga dorosłych i przez dwie minuty odegrajcie rozmowę, zachowując ustalone granice.',i:2,r:2},
+{id:'p5',q:'Czy chcecie podkręcić atmosferę przez wybór muzyki i światła?',a:'Wspólnie wybierzcie jeden utwór i ustawcie światło tak, by obojgu było komfortowo.',i:1,r:1}
+];
+let s={screen:'age',a:{name:'Partner A',limit:1},b:{name:'Partner B',limit:1},turn:0,pos:0,points:0,card:null,aa:'no',ab:'no',ca:false,cb:false};
+const app=document.getElementById('app');
+function btn(t,fn,alt=false){return '<button class="'+(alt?'alt':'')+'" onclick="'+fn+'">'+t+'</button>'}
+function render(){
+ let h='';
+ if(s.screen==='age')h='<div class="card"><h2>Gra dla dwóch dorosłych partnerów</h2><p>Ta wersja używa samopotwierdzenia wieku; nie jest to silna weryfikacja tożsamości ani wieku.</p><label><input id="adult" type="checkbox"> Potwierdzamy, że oboje mamy co najmniej 18 lat.</label>'+btn('ROZPOCZNIJ','age()')+'</div>';
+ if(s.screen==='pa'||s.screen==='pb'){let p=s.screen==='pa'?s.a:s.b;h='<div class="card"><h2>Profil prywatny — '+p.name+'</h2><label>Nazwa</label><input id="name" type="text" value="'+esc(p.name)+'"><label>Limit intensywności: <b id="lim">'+p.limit+'/3</b></label><input id="range" class="range" type="range" min="1" max="3" value="'+p.limit+'" oninput="document.getElementById(\'lim\').textContent=this.value+\'/3\'"><p>Niższy z dwóch limitów zawsze wygrywa.</p>'+btn('ZAPISZ I DALEJ','profile()')+'</div>'}
+ if(s.screen==='lobby')h='<div class="card"><h2>Lobby pary</h2><span class="pill">'+esc(s.a.name)+' • '+s.a.limit+'/3</span><span class="pill">'+esc(s.b.name)+' • '+s.b.limit+'/3</span><p>Odpowiedzi prywatne są trzymane tylko w pamięci tej sesji. Odmowa i pominięcie nigdy nie odbierają punktów.</p>'+btn('NOWA SESJA','start()')+'</div>';
+ if(s.screen==='board'){let g='';for(let i=0;i<12;i++)g+='<div class="tile '+(i===s.pos?'on':'')+'">'+String(i+1).padStart(2,'0')+'</div>';h='<div class="card"><h2>Plansza • runda '+(s.turn+1)+'/8</h2><p>Wspólne punkty: <b>'+s.points+'</b></p><div class="grid">'+g+'</div>'+btn('ODKRYJ NASTĘPNE POLE','round()')+btn('ZAKOŃCZ SESJĘ','summary()',true)+'</div>'}
+ if(s.screen==='qa'||s.screen==='qb'){let who=s.screen==='qa'?s.a.name:s.b.name;h='<div class="card"><h2>Ekran prywatny — '+esc(who)+'</h2><p class="notice">Przekaż urządzenie właściwej osobie. Partner nie zobaczy tej odpowiedzi.</p><h2>'+esc(s.card.q)+'</h2>'+btn('TAK',"answer('yes')")+btn('MOŻE',"answer('maybe')",true)+btn('NIE',"answer('no')",true)+btn('POMIŃ BEZ KARY','skip()',true)+'</div>'}
+ if(s.screen==='match'){let m=s.aa==='yes'&&s.ab==='yes';h='<div class="card"><h2>'+(m?'WSPÓLNE TAK':'BRAK WSPÓLNEGO TAK')+'</h2><p>'+(m?'Każda osoba potwierdzi teraz zgodę osobno.':'Gra nie ujawnia, kto wybrał TAK, MOŻE lub NIE.')+'</p>'+(m?btn('PRZEJDŹ DO ZGODY','consentA()'):btn('DALEJ','advance()'))+'</div>'}
+ if(s.screen==='ca'||s.screen==='cb'){let who=s.screen==='ca'?s.a.name:s.b.name;h='<div class="card"><h2>Potwierdzenie zgody — '+esc(who)+'</h2><p>Możesz odmówić bez żadnej konsekwencji w grze.</p>'+btn('ZGADZAM SIĘ NA TĘ AKTYWNOŚĆ',"consent(true)")+btn('NIE / POMIŃ',"consent(false)",true)+'</div>'}
+ if(s.screen==='activity')h='<div class="card"><h2>Wspólna aktywność</h2><p>'+esc(s.card.a)+'</p><p>Punkty są za dobrowolne ukończenie rundy, nie za samą zgodę.</p>'+btn('UKOŃCZONE','complete()')+btn('POMIŃ BEZ KARY','skip()',true)+'</div>';
+ if(s.screen==='summary')h='<div class="card"><h2>Podsumowanie</h2><p>Rundy: '+s.turn+'<br>Wspólne punkty: '+s.points+'</p><p>Pominięcia i odmowy nie są zliczane ani oceniane.</p>'+btn('NOWA SESJA','start()')+btn('WRÓĆ DO LOBBY',"go('lobby')",true)+'</div>';
+ app.innerHTML=h;
+}
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function age(){if(document.getElementById('adult').checked){s.screen='pa';render()}}
+function profile(){let p=s.screen==='pa'?s.a:s.b;p.name=document.getElementById('name').value||p.name;p.limit=+document.getElementById('range').value;s.screen=s.screen==='pa'?'pb':'lobby';render()}
+function start(){s.turn=0;s.pos=0;s.points=0;s.screen='board';render()}
+function round(){let limit=Math.min(s.a.limit,s.b.limit);let pool=cards.filter(c=>c.i<=limit);s.card=pool[(s.turn*7+s.pos*3)%pool.length];s.aa='no';s.ab='no';s.ca=false;s.cb=false;s.screen='qa';render()}
+function answer(v){if(s.screen==='qa'){s.aa=v;s.screen='qb'}else{s.ab=v;s.screen='match'}render()}
+function consentA(){s.screen='ca';render()}
+function consent(v){if(s.screen==='ca'){s.ca=v;s.screen='cb'}else{s.cb=v;if(s.ca&&s.cb)s.screen='activity';else advance()}render()}
+function complete(){s.points+=s.card.r;advance()}
+function skip(){advance()}
+function advance(){s.turn++;s.pos=Math.min(11,s.pos+1);s.screen=s.turn>=8?'summary':'board';render()}
+function summary(){s.screen='summary';render()}
+function go(x){s.screen=x;render()}
+render();
+</script></body></html>

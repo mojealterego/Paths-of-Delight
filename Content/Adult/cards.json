@@ -1,0 +1,22 @@
+{
+  "cards": [
+    {
+      "id": "adult-001",
+      "prompt": "Czy oboje chcecie w tej sesji wejść w odważniejszy, wcześniej uzgodniony scenariusz?",
+      "activity": "Wybierzcie prywatny scenariusz z własnych ustaleń. Przed rozpoczęciem każde z was ponownie potwierdza granice i może przerwać w dowolnym momencie.",
+      "intensity": 3,
+      "edition": "adult",
+      "tags": ["roleplay"],
+      "rewardPoints": 3
+    },
+    {
+      "id": "adult-002",
+      "prompt": "Czy chcecie wykorzystać bezpieczne akcesorium, które oboje wcześniej zaakceptowaliście?",
+      "activity": "Wybierzcie tylko wcześniej uzgodnione akcesorium i ustalcie prosty sygnał przerwania. Jeśli którekolwiek z was zmieni zdanie, pomińcie kartę bez konsekwencji.",
+      "intensity": 3,
+      "edition": "adult",
+      "tags": ["props"],
+      "rewardPoints": 3
+    }
+  ]
+}
