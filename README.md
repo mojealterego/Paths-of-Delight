@@ -18,13 +18,14 @@ Consent-first, privacy-by-design digital board game for adult couples (18+).
 - Build-time Play / Adult content separation.
 - EditMode regression tests.
 - Android API 36, ARM64, IL2CPP build configuration.
-- CI content validation and APK artifacts.
+- GitHub CI content validation and installable preview APK.
+- Unity Build Automation hooks for cloud-only canonical Unity builds.
 
 ## Repository map
 
 ```text
 Assets/
-  Editor/                 deterministic Unity build
+  Editor/                 deterministic Unity + cloud build hooks
   Scripts/
     Data/                 content + local vault
     Gameplay/             director + consent rules
@@ -36,25 +37,33 @@ Content/
   Adult/                  Adult Edition source catalog, outside Assets
 Tools/                    build-time validators
 docs/                     architecture, security, consent and build notes
-android-preview/          installable smoke APK independent of Unity licensing
-.github/workflows/ci.yml  validation + APK pipelines
+android-preview/          installable smoke APK built by GitHub Actions
+.github/workflows/ci.yml  validation + preview APK pipeline
 ```
 
-## Local validation
+## Cloud-only development model
 
-```bash
-python Tools/validate_content.py
+No local Unity installation is required for the intended workflow.
+
+GitHub remains the source repository. The canonical Unity APK is designed to be built by **Unity Build Automation** after the repository is connected once in the Unity Dashboard.
+
+Cloud pre-export method:
+
+```text
+PathsOfDelight.Editor.CloudBuildHooks.PreExport
 ```
 
-## Canonical Unity APK
+Environment variable:
 
-The Unity build uses `PathsOfDelight.Editor.BuildCommand.PerformAndroidBuild` and Unity `6000.3.13f1`.
+```text
+POD_EDITION=play
+```
 
-GameCI requires repository secrets `UNITY_LICENSE`, `UNITY_EMAIL` and `UNITY_PASSWORD`. When they are present, CI runs Unity EditMode tests and publishes the canonical Play APK.
+For the direct Adult build use `POD_EDITION=adult`.
 
 ## Installable preview APK
 
-CI always builds `android-preview/` with Android API 36. This is a smoke-build implementation of the same consent-first flow and exists so an installable APK can be produced without exposing Unity credentials.
+GitHub Actions always builds `android-preview/` with Android API 36, so a smoke APK can be produced without Unity credentials or local software.
 
 ## Safety invariants
 
@@ -65,4 +74,4 @@ CI always builds `android-preview/` with Android API 36. This is a smoke-build i
 - Intimate round answers are not written to logs, analytics or the local save.
 - Optional future integrations never gate core gameplay.
 
-See `docs/` for architecture and security details.
+See `docs/` for architecture, security and cloud build details.
