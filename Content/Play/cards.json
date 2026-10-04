@@ -1,0 +1,58 @@
+{
+  "cards": [
+    {
+      "id": "play-001",
+      "prompt": "Czy macie ochotę na minutę spokojnego kontaktu wzrokowego?",
+      "activity": "Usiądźcie naprzeciwko siebie i przez minutę skupcie uwagę wyłącznie na sobie.",
+      "intensity": 1,
+      "edition": "play",
+      "tags": ["connection"],
+      "rewardPoints": 1
+    },
+    {
+      "id": "play-002",
+      "prompt": "Czy oboje macie dziś ochotę na dłuższy pocałunek?",
+      "activity": "Jeśli oboje nadal chcecie, wybierzcie spokojne miejsce i poświęćcie chwilę na pocałunek bez pośpiechu.",
+      "intensity": 1,
+      "edition": "play",
+      "tags": ["kiss"],
+      "rewardPoints": 1
+    },
+    {
+      "id": "play-003",
+      "prompt": "Czy chcecie spróbować krótkiej gry w ciepło–zimno z neutralnym dotykiem dłoni i ramion?",
+      "activity": "Jedna osoba zamyka oczy, druga prowadzi ją słowami ciepło–zimno do wybranego miejsca na dłoni lub ramieniu. Po chwili zamieńcie role.",
+      "intensity": 1,
+      "edition": "play",
+      "tags": ["touch"],
+      "rewardPoints": 2
+    },
+    {
+      "id": "play-004",
+      "prompt": "Czy chcecie dziś spróbować krótkiej, umownej scenki flirtu?",
+      "activity": "Wybierzcie neutralny motyw spotkania dwojga dorosłych i przez dwie minuty odegrajcie rozmowę, zachowując ustalone granice.",
+      "intensity": 2,
+      "edition": "play",
+      "tags": ["roleplay"],
+      "rewardPoints": 2
+    },
+    {
+      "id": "play-005",
+      "prompt": "Czy chcecie podkręcić atmosferę przez wybór muzyki i światła?",
+      "activity": "Wspólnie wybierzcie jeden utwór i ustawcie światło tak, by obojgu było komfortowo.",
+      "intensity": 1,
+      "edition": "play",
+      "tags": ["atmosphere"],
+      "rewardPoints": 1
+    },
+    {
+      "id": "play-006",
+      "prompt": "Czy macie ochotę powiedzieć sobie po jednej rzeczy, która dziś szczególnie was przyciąga?",
+      "activity": "Każde z was mówi jedno zdanie uznania. Bez oceniania i bez obowiązku rozwijania tematu.",
+      "intensity": 1,
+      "edition": "play",
+      "tags": ["communication"],
+      "rewardPoints": 1
+    }
+  ]
+}
